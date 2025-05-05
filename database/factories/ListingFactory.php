@@ -24,6 +24,7 @@ class ListingFactory extends Factory
             'company' => $this->faker->company(),
             'location' => $this->faker->address(),
             'tags' => 'laravel, api, backend',
+            'user_id' => 1,
         ];
     }
 }

@@ -8,7 +8,7 @@ Route::get('/', [ListingController::class, 'index'])->name('home');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::redirect('dashboard', '/')->name('dashboard');
 
-
+    Route::get('manage-listings', [ListingController::class, 'manage'])->name('manage-listings');
     Route::resource('listings', ListingController::class)->except(['index']);
 });
 

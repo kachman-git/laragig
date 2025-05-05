@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('listings', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->foreignId('user_id')->constrained('users');
             $table->string('tags');
             $table->string('logo')->nullable();
             $table->string('description');

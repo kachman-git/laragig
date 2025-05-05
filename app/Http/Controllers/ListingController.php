@@ -25,7 +25,6 @@ class ListingController extends Controller
      */
     public function show(Listing $listing)
     {
-
         return Inertia::render('Listings/ShowListing', compact('listing'));
     }
 
@@ -42,27 +41,44 @@ class ListingController extends Controller
      */
     public function update(Request $request, Listing $listing)
     {
+        if ($listing->user_id != auth()->id()) {
+            abort(403, 'Unauthorized Action');
+        }
+        $logo = $listing->logo;
 
-//        if($listing->user_id != auth()->id()) {
-//            abort(403, 'Unauthorized Action');
-//        }
-        $formFields = $request->validate([
+        if ($request->hasFile('logo')) {
+            if ($listing->logo) {
+                Storage::disk('public')->delete($listing->logo);
+            }
+
+            $logo = $request->file('logo')->store('logos', 'public');
+        }
+
+        $formData = $request->validate([
             'title' => 'required',
-            'company' => ['required'],
+            'company' => 'required',
             'location' => 'required',
             'website' => 'required',
             'email' => ['required', 'email'],
             'tags' => 'required',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             'description' => 'required'
         ]);
 
-        if ($request->hasFile('logo')) {
-            $formFields['logo'] = $request->file('logo')->store('logos', 'public');
-        }
+        $listing->update([
+            'title' => $formData['title'],
+            'description' => $formData['description'],
+            'location' => $formData['location'],
+            'company' => $formData['company'],
+            'website' => $formData['website'],
+            'email' => $formData['email'],
+            'logo' => $logo,
+            'user_id' => auth()->id(),
+            'tags' => $formData['tags'],
+        ]);
 
-        $listing->update($formFields);
-
-        return back()->with('message', 'Listing updated successfully!');
+        return Redirect::route('listings.show', $listing)
+            ->with('success', 'Listing updated successfully');
     }
 
     /**
@@ -71,6 +87,7 @@ class ListingController extends Controller
     public function store(Request $request)
     {
         $logo = null;
+
         if ($request->file('logo')) {
             $logo = $request->file('logo')->store('logos', 'public');
         }
@@ -96,6 +113,7 @@ class ListingController extends Controller
             'website' => $formData['website'],
             'email' => $formData['email'],
             'logo' => $logo,
+            'user_id' => auth()->id(),
             'tags' => $formData['tags'],
         ]);
         return Redirect::route('dashboard')->with('success', 'Listing created.');
@@ -121,6 +139,7 @@ class ListingController extends Controller
         if ($listing->logo && Storage::disk('public')->exists($listing->logo)) {
             Storage::disk('public')->delete($listing->logo);
         }
+        $listing->delete();
         return Redirect::route('home')->with('success', 'Listing deleted.');
     }
 

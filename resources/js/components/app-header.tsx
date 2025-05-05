@@ -1,6 +1,8 @@
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { UserMenuContent } from '@/components/user-menu-content';
 import { SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { DoorOpen, Settings } from 'lucide-react';
+import { Settings } from 'lucide-react';
 
 export function AppHeader() {
     const page = usePage<SharedData>();
@@ -14,17 +16,18 @@ export function AppHeader() {
             <ul className="mr-6 flex space-x-6 text-lg">
                 {auth.user ? (
                     <div className={'flex items-center gap-4 pt-4'}>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger>
+                                <span className="hover:text-laravel cursor-pointer font-bold uppercase">Welcome {auth.user.name}</span>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56" align="end">
+                                <UserMenuContent user={auth.user} />
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
                         <li>
-                            <span className="font-bold uppercase">Welcome {auth.user.name}</span>
-                        </li>
-                        <li>
-                            <Link prefetch href="/listings/manage" className="hover:text-laravel flex items-center gap-3">
+                            <Link prefetch href={route('manage-listings')} className="hover:text-laravel flex items-center gap-2">
                                 <Settings /> Manage Listings
-                            </Link>
-                        </li>
-                        <li>
-                            <Link className="hover:text-laravel flex items-center gap-3" method="post" href={route('logout')}>
-                                <DoorOpen /> Logout
                             </Link>
                         </li>
                     </div>

@@ -158,8 +158,8 @@ export default function CreateListing() {
                         </div>
 
                         <div className="mb-6">
-                            <Button variant={'outline'} disabled={processing} className="bg-laravel rounded px-4 py-2 text-black dark:text-white">
-                                Create Gig
+                            <Button variant={'outline'} disabled={processing} className="bg-laravel rounded px-4 py-2 text-white">
+                                {processing ? 'Creating...' : 'Create Gig'}
                             </Button>
 
                             <Link prefetch href="/" className="ml-4">

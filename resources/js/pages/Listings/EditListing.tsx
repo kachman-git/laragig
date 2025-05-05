@@ -5,13 +5,15 @@ import { Label } from '@/components/ui/label';
 import Layout from '@/layouts/app-layout';
 import { Listings } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEvent } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 
 export default function EditListing({ listing }: { listing: Listings }) {
+    const [logoPreview, setLogoPreview] = useState<string | null>(listing.logo || null);
     const { data, setData, processing, errors, put, reset } = useForm({
         company: listing.company,
         description: listing.description,
         email: listing.email,
+        logo: undefined as unknown as File,
         location: listing.location,
         tags: listing.tags,
         title: listing.title,
@@ -19,13 +21,24 @@ export default function EditListing({ listing }: { listing: Listings }) {
     });
     const submit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(data);
         put(route('listings.update', [listing]), {
-            onSuccess: () => {
-                reset();
-            },
+            onSuccess: () => reset(),
         });
     };
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files?.[0] && e.target.files.length > 0) {
+            setData('logo', e.target.files[0]);
+            setLogoPreview(URL.createObjectURL(e.target.files[0]));
+        }
+    };
+
+    useEffect(() => {
+        if (listing.logo) {
+            setLogoPreview(`/storage/${listing.logo}`);
+        }
+    }, [listing.logo]);
+
     return (
         <Layout>
             <Head title="LaraGigs | Find Laravel Jobs & Projects" />
@@ -45,7 +58,7 @@ export default function EditListing({ listing }: { listing: Listings }) {
                             <Input
                                 type="text"
                                 value={data.company}
-                                onChange={(e) => setData('company', e.target.value)}
+                                onChange={(e) => setData('company', e.target.value.trim())}
                                 className="p-2"
                                 name="company"
                             />
@@ -124,14 +137,16 @@ export default function EditListing({ listing }: { listing: Listings }) {
                             <InputError message={errors.tags} />
                         </div>
 
-                        {/*<div className="mb-6">*/}
-                        {/*    <Label htmlFor="logo" className="mb-2 inline-block text-lg">*/}
-                        {/*        Company Logo*/}
-                        {/*    </Label>*/}
+                        <div className="mb-6">
+                            <Label htmlFor="logo" className="mb-2 inline-block text-lg">
+                                Company Logo
+                            </Label>
 
-                        {/*    <Input type="file" className="p-2" name="logo" />*/}
-                        {/*    <InputError message={errors.logo} />*/}
-                        {/*</div>*/}
+                            <Input type="file" onChange={handleFileUpload} className="p-2" name="logo" />
+                            {logoPreview && <img src={logoPreview} alt={'Company Logo'} onError={() => setLogoPreview('/placeholder-image.jpg')} />}
+
+                            <InputError message={errors.logo} />
+                        </div>
 
                         <div className="mb-6 grid gap-2">
                             <Label htmlFor="description" className="mb-2 inline-block text-lg">
@@ -149,8 +164,8 @@ export default function EditListing({ listing }: { listing: Listings }) {
                         </div>
 
                         <div className="mb-6">
-                            <Button variant={'outline'} disabled={processing} className="bg-laravel rounded px-4 py-2 text-black dark:text-white">
-                                Create Gig
+                            <Button disabled={processing} className={`bg-laravel text-white dark:hover:text-black ${processing ? 'opacity-75' : ''}`}>
+                                {processing ? 'Updating...' : 'Update Gig'}
                             </Button>
 
                             <Link prefetch href="/" className="ml-4">
