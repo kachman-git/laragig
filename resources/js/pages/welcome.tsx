@@ -1,19 +1,17 @@
 import Hero from '@/components/Hero';
-import Listing from '@/components/Listing';
 import Search from '@/components/Search';
 import AppLayout from '@/layouts/app-layout';
+import ListingIndex from '@/pages/Listings/ListingIndex';
+import { Listings, PaginatedResponse } from '@/types';
 import { Head } from '@inertiajs/react';
 
-export default function Welcome() {
+export default function Welcome({ listings }: { listings: PaginatedResponse<Listings> }) {
     return (
         <AppLayout>
-            <Head title="Welcome">
-                <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-            </Head>
+            <Head title="Welcome" />
             <Hero />
             <Search />
-            <Listing />
+            <ListingIndex listings={listings} />
         </AppLayout>
     );
 }

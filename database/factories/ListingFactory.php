@@ -23,7 +23,7 @@ class ListingFactory extends Factory
             'website' => $this->faker->url(),
             'company' => $this->faker->company(),
             'location' => $this->faker->address(),
-            'tags' => $this->faker->randomElement(['HTML', 'CSS', 'JavaScript', 'PHP']),
+            'tags' => 'laravel, api, backend',
         ];
     }
 }

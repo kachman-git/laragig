@@ -1,5 +1,5 @@
 import type { SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
 const Hero = () => {
     const { auth } = usePage<SharedData>().props;
@@ -14,13 +14,22 @@ const Hero = () => {
                     </h1>
                     <p className="my-4 text-2xl font-bold text-gray-200">Find or post Laravel jobs & projects</p>
                     <div>
-                        {auth.user && (
-                            <a
-                                href="/register"
+                        {auth.user ? (
+                            <Link
+                                prefetch
+                                href={route('listings.create')}
+                                className="mt-2 inline-block rounded-xl border-2 border-white px-4 py-2 text-white uppercase hover:border-black hover:text-black"
+                            >
+                                Create a Gig
+                            </Link>
+                        ) : (
+                            <Link
+                                prefetch
+                                href={route('register')}
                                 className="mt-2 inline-block rounded-xl border-2 border-white px-4 py-2 text-white uppercase hover:border-black hover:text-black"
                             >
                                 Sign Up to List a Gig
-                            </a>
+                            </Link>
                         )}
                     </div>
                 </div>
